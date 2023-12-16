@@ -1,5 +1,13 @@
 import json
+import time
 from googletrans import Translator, LANGUAGES
+
+def format_time(seconds):
+    """Converts time in seconds to a more readable format (days, hours, minutes, seconds)."""
+    days, seconds = divmod(seconds, 86400)
+    hours, seconds = divmod(seconds, 3600)
+    minutes, seconds = divmod(seconds, 60)
+    return f"{int(days)}d {int(hours)}h {int(minutes)}m {int(seconds)}s"
 
 def translate_words(input_file, output_file, languages):
     translator = Translator()
@@ -26,6 +34,7 @@ def translate_words(input_file, output_file, languages):
 
     total_words = len(words)
     processed_count = 0
+    start_time = time.time()
 
     for word in words:
         # Skip if the word is less than one character
@@ -49,7 +58,13 @@ def translate_words(input_file, output_file, languages):
                 translations[word][lang] = ""
 
         processed_count += 1
-        print(f"Processed {processed_count}/{total_words} words", end='\r')
+        elapsed_time = time.time() - start_time
+        avg_time_per_word = elapsed_time / processed_count
+        estimated_total_time = avg_time_per_word * total_words
+        remaining_time = estimated_total_time - elapsed_time
+
+        formatted_time = format_time(remaining_time)
+        print(f"Processed {processed_count}/{total_words} words. Estimated time remaining: {formatted_time}", end='\r')
 
     # Save translations to a JSON file
     with open(output_file, 'w', encoding='utf-8') as file:
