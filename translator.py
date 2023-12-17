@@ -10,21 +10,16 @@ def format_time(seconds):
     minutes, seconds = divmod(seconds, 60)
     return f"{int(days)}d {int(hours)}h {int(minutes)}m {int(seconds)}s"
 
-def translate_word(word, languages, translator, max_retries=3):
+def translate_word(word, languages, translator):
     translations = {}
     for lang in languages:
         attempt = 0
-        while attempt < max_retries:
-            try:
-                translated = translator.translate(word, dest=lang).text
-                translations[lang] = translated
-                break;
-            except Exception as e:
-                print(f"Retry {attempt + 1} for {word} in {lang}")
-                attempt += 1
-                if attempt == max_retries:
-                    print(f"Failed to translate {word} to {lang}: {e}")
-                    translations[lang] = ""
+        try:
+            translated = translator.translate(word, dest=lang).text
+            translations[lang] = translated
+            break;
+        except Exception as e:
+            pass
     return word, translations
 
 def translate_words(input_file, output_file, languages):
@@ -66,7 +61,7 @@ def translate_words(input_file, output_file, languages):
                 translations[word].update(word_translations)
                 processed_count += 1
             except Exception as e:
-                print(f"Error translating {word}: {e}")
+                pass
 
             elapsed_time = time.time() - start_time
             avg_time_per_word = elapsed_time / processed_count if processed_count else 0
@@ -84,4 +79,4 @@ def translate_words(input_file, output_file, languages):
 
 # Usage
 languages_to_translate = ['no', 'en', 'zh-CN', 'ja']  # Add more language codes as needed
-translate_words('fx.json', 'translation.json', languages_to_translate)
+translate_words('dictionary.json', 'translation.json', languages_to_translate)
